@@ -1,0 +1,179 @@
+<!doctype htmass="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StockBr0ke | Welcome</title>
+    <script src="smoothie.js"></script>
+    <link rel="stylesheet" href="foundation-5.2.1/css/foundation.css" />
+    <script src="foundation-5.2.1/js/vendor/modernizr.js"></script>
+   <style>
+    table {
+      border-collapse:collapse;
+    }
+    table, td, th {
+      border:1px solid black;
+    }
+    </style>
+
+  </head>
+
+  <body>
+
+    <div class="row">
+      <div class="large-12 columns">
+	<p>
+       	<center> <img src="http://www.auplod.com/u/opalud29260.png" alt="Welcome to StockBr0ke" border="0" /></a></center>
+        <hr />
+      </div>
+
+     <form>
+
+         <div class="medium-3 columns">
+            <div class="callout panel">
+              <p><b>Name:</b> Wilbert Johnson</p>
+              <p><b>Gender: </b> Male</p>
+              <p><b>Info: </b> Mechanical Engineer and Investor</p>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="large-8 columns">
+
+              <table>
+                <thead>
+                  <tr>
+                    <th width="350"><font color="green"><center>GAINED</font> since 'logged on date'</center></th>
+                    <th width="350"><b><font color="red"><center>LOST</font> since 'logged on date'</center></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><center>INSERT AMOUNT GAINED HERE</center></td>
+                    <td><center>INSERT AMOUNT LOST HERE</center></td>
+                  </tr>
+                  </tbody>
+              </table>
+
+              <div class="large-5 columns">
+                <div style="position:relative;left:75px;> <a href="#" class="small success button">START TRADE</a><br/></div>
+              </div>
+
+              <div class="large-5 columns">
+                    <a href="#" class="small alert button">STOP TRADE"</a><br/>
+              </div>
+
+            </div>
+          </div>
+
+      </div>
+    </form>
+
+
+    <form>
+      <div class="row">
+          
+        <div class="medium-3 columns">
+          <div class="callout panel">
+              <p><b><u>AVERAGE GAINS</u></b></p>
+              <p><b>Day:</b> INSERT</p>
+              <p><b>Week:</b> 'INSERT'</p>
+              <p><b>Month:</b> 'INSERT'</p>
+              <p><b>Year:</b> 'INSERT'</p>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="large-8 columns">
+              <div class="panel">
+                <p><b>Current Assets:</b></p>
+		<canvas id="assetsChart" width="620" height="205"></canvas>
+              </div>
+            </div>
+          </div>
+
+      </div>
+    </form>
+
+    <div class="row">
+      <div class="large-12 columns">
+        <div class="row">
+          <div class="large-4 columns"><center><b>AAPL</b></center></div>
+          <div class="large-3 columns"><center><b>GOOG</b></center></div>
+          <div class="large-3 columns"><b>INTC</b></div>
+        </div>
+
+        <ul class="small-block-grid-3">
+          <canvas id="stockChart1" width="297" height="200"></canvas>
+          <canvas id="stockChart2" width="297" height="200"></canvas>
+         <canvas id="stockChart3" width="297" height="200"></canvas>
+        </ul>
+      </div>
+    </div> 
+
+  </body>
+
+  <script>
+      // Data
+      var line1 = new TimeSeries();
+      var line2 = new TimeSeries();
+      var line3 = new TimeSeries();
+      var line4 = new TimeSeries();
+
+      setInterval(function() {
+        $.getJSON('get_current.php', function(data) {
+          //console.log(data);
+
+          var data1_temp = parseFloat(data[0].quote[0].ask) + Math.random()*10;
+          var data2_temp = parseFloat(data[0].quote[1].ask) + Math.random()*10;
+          var data3_temp = parseFloat(data[0].quote[2].ask) + Math.random()*10;
+
+          var data1 = parseFloat(data[0].quote[0].ask);
+            var data2 = parseFloat(data[0].quote[1].ask);
+            var data3 = parseFloat(data[0].quote[2].ask);
+
+            line1.append(new Date().getTime(), data1_temp);
+            line2.append(new Date().getTime(), data2_temp);
+            line3.append(new Date().getTime(), data3_temp);
+
+            var count1 = parseInt(data[1].stocks[0].count);
+            var count2 = parseInt(data[1].stocks[1].count);
+            var count3 = parseInt(data[1].stocks[2].count);
+
+            var assets = data1_temp*count1 + data2_temp*count2 + data3_temp*count3 + parseFloat(data[1].balance[0].balance);
+            line4.append(new Date().getTime(), assets);
+            
+         });
+      }, 1000);
+
+      setInterval(function() {
+        $.getJSON('predict.php', function(data) {
+         });
+      }, 5000);
+
+      var stockChart1 = new SmoothieChart({ grid: { strokeStyle: 'rgb(125, 0, 0)', fillStyle: 'rgb(60, 0, 0)', lineWidth: 1, millisPerLine: 250, verticalSections: 6 } });
+      stockChart1.addTimeSeries(line1, { strokeStyle: 'rgb(0, 255, 0)', fillStyle: 'rgba(0, 255, 0, 0.4)', lineWidth: 3 });
+      stockChart1.streamTo(document.getElementById("stockChart1"));
+
+      var stockChart2 = new SmoothieChart({ grid: { strokeStyle: 'rgb(125, 0, 0)', fillStyle: 'rgb(60, 0, 0)', lineWidth: 1, millisPerLine: 250, verticalSections: 6 } });
+      stockChart2.addTimeSeries(line2, { strokeStyle: 'rgb(0, 255, 0)', fillStyle: 'rgba(0, 255, 0, 0.4)', lineWidth: 3 });
+      stockChart2.streamTo(document.getElementById("stockChart2"));
+
+      var stockChart3 = new SmoothieChart({ grid: { strokeStyle: 'rgb(125, 0, 0)', fillStyle: 'rgb(60, 0, 0)', lineWidth: 1, millisPerLine: 250, verticalSections: 6 } });
+      stockChart3.addTimeSeries(line3, { strokeStyle: 'rgb(0, 255, 0)', fillStyle: 'rgba(0, 255, 0, 0.4)', lineWidth: 3 });
+      stockChart3.streamTo(document.getElementById("stockChart3"));
+
+      var assetsChart = new SmoothieChart({ grid: { strokeStyle: 'rgb(125, 0, 0)', fillStyle: 'rgb(60, 0, 0)', lineWidth: 1, millisPerLine: 250, verticalSections: 6 } });
+      assetsChart.addTimeSeries(line4, { strokeStyle: 'rgb(0, 255, 0)', fillStyle: 'rgba(0, 255, 0, 0.4)', lineWidth: 3 });
+      assetsChart.streamTo(document.getElementById("assetsChart"));
+
+    </script>
+</html>
+
+
+    <script src="foundation-5.2.1/js/vendor/jquery.js"></script>
+    <script src="foundation-5.2.1/js/foundation.min.js"></script>
+ <script>
+      $(document).foundation();
+    </script>
+  </body>
+</html>
